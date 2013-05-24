@@ -1,0 +1,63 @@
+# Sample configuration. Place in the config/ directory of your rails project.
+
+# List of heroku instances. Key will appear in the names of rake tasks and
+# value is the actual name of heroku application.
+instances:
+  staging: staging-myapp
+  production: production-myapp
+
+# Where to store the temporary development database backup.
+development_backup_path: 'development.dump'
+
+# Sanitization rules.
+sanitize:
+  replacements:
+    email: 'user'
+    password: '$2a$10$vd.f536.MwLSKBoU/BciEOlzVr7VAkeIfBsMnndvbMlsVYqF7dazW' # 'abc123'
+
+  # Tables that should be completely emptied.
+  clear_table:
+    - sessions
+
+  # List of fields containing email addresses. Given an email address of
+  # 'bob@mail.com' and replacement name of 'admin', the result will be
+  # 'admin+bob.mail.com@localhost'.
+  email:
+    - admins.email
+    - users.email
+
+  # Fields containing encrypted passwords. They will all be replaced with the
+  # replacement password specified above.
+  password:
+    - admins.encrypted_password
+    - users.encrypted_password
+
+  # Fields containing phone numbers. They are replaced with '888' plus the
+  # record's id padded to seven zeroes.
+  phone_number:
+    - users.phone
+
+  # Fields that are replaced with NULL.
+  clear:
+    - admins.reset_password_token
+    - users.reset_password_token
+
+  # Fields that contain sensitive text. Lower case letters are replaced with
+  # 'x', upper case with 'X' and numbers with 'Y'.
+  text:
+    - messages.body
+
+  # Fields that are replaced with a unique value (the field name plus the
+  # record's ID).
+  unique:
+    - devices.authentication_token
+
+# Validation rules.
+validate:
+
+  # Errors that should be ignored. Keys are model class names and values are
+  # a list of the errors to be ignored (as returned by #full_messages).
+  ignore_errors:
+    Photo:
+      - "Image can't be blank"
+
