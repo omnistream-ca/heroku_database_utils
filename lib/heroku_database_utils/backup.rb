@@ -29,7 +29,11 @@ module HerokuDatabaseUtils
       raise "Failed to download database dump" if $? != 0
 
       system(
-        'pg_restore', '-c', '-O', '-w', '-h', p(:host), '-p', p(:port), '-U',
+        'psql', '-w', '-h', p(:host), '-p', p(:port), '-U', p(:username),
+        '-c', 'DROP SCHEMA public CASCADE; CREATE SCHEMA public', p(:database)
+      )
+      system(
+        'pg_restore', '-O', '-w', '-h', p(:host), '-p', p(:port), '-U',
         p(:username), '-d', p(:database), dump
       )
       raise "Failed to restore database dump" if $? != 0
