@@ -8,6 +8,7 @@ module HerokuDatabaseUtils
       puts "Validating all models"
       result = false
 
+      concrete_models.each(&:reset_column_information)
       concrete_models.each do |model|
         count = model.count
         i = 0
