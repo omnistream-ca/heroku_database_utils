@@ -20,7 +20,8 @@ module HerokuDatabaseUtils
 
     def load_latest_app_backup app
       dump = "#{app}.dump"
-      backup_id = `heroku pgbackups --app #{app} | tail -n 1 | awk '{ print $1 }'`.strip
+      raise "Couldn't find backup ID" unless `heroku pgbackups --app #{app}` =~ /^([a-z]\w+)/
+      backup_id = $1
       puts "Using backup ID: #{backup_id}"
       url = `heroku pgbackups:url #{backup_id} --app #{app}`.strip.gsub(/^"|"$/, '')
       raise "Failed to download database dump" if $? != 0
