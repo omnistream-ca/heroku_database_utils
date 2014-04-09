@@ -38,6 +38,7 @@ namespace :hdb do
     desc "Resume a validation task on heroku DB replica (to test if update models/migrations fix previous validation run failure"
     task :continue_validation => [
       :"db:migrate",
+      :"hdb:development:sanitize",
       :"hdb:development:validate",
       :"hdb:development:restore",
       :"db:schema:dump"
@@ -63,8 +64,8 @@ namespace :hdb do
       task :validate => [
         :"hdb:development:backup_unless_present",
         :"hdb:#{ns}:load_latest_backup",
-        :"hdb:development:sanitize",
         :"db:migrate",
+        :"hdb:development:sanitize",
         :"hdb:development:validate",
         :"hdb:development:restore",
         :"db:schema:dump"
