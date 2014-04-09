@@ -20,10 +20,10 @@ module HerokuDatabaseUtils
 
     def load_latest_app_backup app
       dump = "#{app}.dump"
-      raise "Couldn't find backup ID" unless `heroku pgbackups --app #{app}` =~ /^([a-z]\w+)/
+      raise "Couldn't find backup ID" unless heroku_cmd("heroku pgbackups --app #{app}") =~ /^([a-z]\w+)/
       backup_id = $1
       puts "Using backup ID: #{backup_id}"
-      url = `heroku pgbackups:url #{backup_id} --app #{app}`.strip.gsub(/^"|"$/, '')
+      url = heroku_cmd("heroku pgbackups:url #{backup_id} --app #{app}").strip.gsub(/^"|"$/, '')
       raise "Failed to download database dump" if $? != 0
 
       system('curl', '-s', '-o', dump, url)
@@ -47,6 +47,12 @@ module HerokuDatabaseUtils
     def p param_name
       @params ||= YAML.load(File.read("config/database.yml"))['development']
       @params[param_name.to_s].to_s
+    end
+
+    def heroku_cmd cmd
+      Bundler.with_clean_env do
+        `#{cmd}`
+      end
     end
 
   end
