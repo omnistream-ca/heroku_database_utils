@@ -1,5 +1,5 @@
 module HerokuDatabaseUtils
-  class Backup
+  class HdbBackup
     def dump file_name
       system(
         'pg_dump', '--format=custom', '-w', '-h', p(:host), '-p', p(:port),

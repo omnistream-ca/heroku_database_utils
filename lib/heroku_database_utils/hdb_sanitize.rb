@@ -1,5 +1,5 @@
 module HerokuDatabaseUtils
-  class Sanitize
+  class HdbSanitize
     def initialize options
       @options = options
     end

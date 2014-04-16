@@ -1,5 +1,5 @@
 module HerokuDatabaseUtils
-  class Validate
+  class HdbValidate
     def initialize options
       @options = options
     end

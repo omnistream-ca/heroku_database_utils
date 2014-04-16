@@ -1,9 +1,9 @@
 require "heroku_database_utils/version"
 require 'heroku_database_utils/railtie' if defined?(Rails)
 
-require "heroku_database_utils/backup"
-require "heroku_database_utils/sanitize"
-require "heroku_database_utils/validate"
+require "heroku_database_utils/hdb_backup"
+require "heroku_database_utils/hdb_sanitize"
+require "heroku_database_utils/hdb_validate"
 
 module HerokuDatabaseUtils
   def options

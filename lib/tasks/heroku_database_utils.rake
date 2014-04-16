@@ -5,7 +5,7 @@ namespace :hdb do
     desc "Backup the current contents of the development database"
     task :backup do
       print "Creating development backup..."
-      Backup.new.dump options[:development_backup_path]
+      HdbBackup.new.dump options[:development_backup_path]
       puts " done"
     end
 
@@ -18,21 +18,21 @@ namespace :hdb do
     desc "Restore the development database"
     task :restore do
       print "Restoring development backup..."
-      Backup.new.restore options[:development_backup_path]
+      HdbBackup.new.restore options[:development_backup_path]
       puts " done"
       File.unlink options[:development_backup_path]
     end
 
     desc "Validate all of the records in the development database"
     task :validate => :environment do
-      if Validate.new(options[:validate]).run
+      if HdbValidate.new(options[:validate]).run
         raise "Validation errors"
       end
     end
 
     desc "Sanitize the development database"
     task :sanitize => :environment do
-      Sanitize.new(options[:sanitize]).run
+      HdbSanitize.new(options[:sanitize]).run
     end
 
     desc "Resume a validation task on heroku DB replica (to test if update models/migrations fix previous validation run failure"
@@ -50,7 +50,7 @@ namespace :hdb do
 
     namespace ns do
       task :load_latest_backup do
-        Backup.new.load_latest_app_backup heroku_name
+        HdbBackup.new.load_latest_app_backup heroku_name
       end
 
       desc "Load and sanitize the latest backup from #{heroku_name} into the development environment"
