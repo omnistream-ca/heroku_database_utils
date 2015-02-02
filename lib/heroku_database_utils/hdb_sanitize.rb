@@ -96,6 +96,7 @@ module HerokuDatabaseUtils
         exec_col col, """
           UPDATE #{table}
           SET #{attr} = '#{attr}' || id
+          WHERE #{attr} IS NOT NULL
         """
       end
     end
