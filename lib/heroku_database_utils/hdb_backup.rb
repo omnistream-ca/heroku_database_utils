@@ -28,7 +28,7 @@ module HerokuDatabaseUtils
       url = heroku_cmd("heroku pgbackups:url #{backup_id} --app #{app}").strip.gsub(/^"|"$/, '')
       raise "Failed to download database dump" if $? != 0
 
-      system('curl', '-s', '-o', dump, url)
+      system('curl', '-o', dump, url)
       raise "Failed to download database dump" if $? != 0
 
       system(
