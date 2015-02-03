@@ -1,6 +1,6 @@
 module HerokuDatabaseUtils
   class HdbValidate
-    def initialize options
+    def initialize(options = {})
       @options = options
     end
 
@@ -10,13 +10,26 @@ module HerokuDatabaseUtils
 
       concrete_models.each(&:reset_column_information)
       concrete_models.each do |model|
+        rel = model.all
+        includes = []
+        model.ancestors.each do |klass|
+          if incl = @options['includes'].try(:[], klass.to_s)
+            includes += incl
+          end
+        end
+        if includes.present?
+          includes = symbolize(includes).uniq
+          rel = rel.includes(*includes)
+        end
+
         count = model.count
         i = 0
         error_ids = []
         errors = []
-        ignore_errors = @options.try(:[], 'ignore_errors').try(:[], model.to_s) || []
+        ignore_errors = @options['ignore_errors'].try(:[], model.to_s) || []
+        time = Time.now.to_i
 
-        model.find_each do |record|
+        rel.find_each do |record|
           begin
             invalid = record.invalid?
           rescue
@@ -34,7 +47,7 @@ module HerokuDatabaseUtils
             end
           end
 
-          print "#{model}#{" !" if errors.any?} #{(i += 1) * 100 / count}%\r"
+          print "#{model}#{" !" if errors.any?} #{(i += 1) * 100 / count}% #{Time.now.to_i - time}s\r"
         end
 
         if error_ids.any?
@@ -66,6 +79,15 @@ module HerokuDatabaseUtils
         end
 
         concrete
+      end
+    end
+
+    def symbolize(v)
+      case v
+      when Array then  v.map { |i| symbolize i }
+      when Hash then   v.each.with_object({}) { |(k, v), h| h[symbolize k] = symbolize v }
+      when String then v.to_sym
+      else             v
       end
     end
   end
