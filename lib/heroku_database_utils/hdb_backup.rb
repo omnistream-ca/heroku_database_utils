@@ -24,12 +24,12 @@ module HerokuDatabaseUtils
 
     def load_latest_app_backup app
       dump = "#{app}.dump"
-      unless heroku_cmd("heroku pgbackups --app #{app} | tail -n +3 | sort -n -k 2 -r") =~ /^([a-z]\w+)/
+      unless heroku_cmd("heroku pg:backups --app #{app} | tail -n +3 | sort -n -k 2 -r") =~ /^([a-z]\w+)/
         raise "Couldn't find backup ID"
       end
       backup_id = $1
       puts "Using backup ID: #{backup_id}"
-      url = heroku_cmd("heroku pgbackups:url #{backup_id} --app #{app}").strip.gsub(/^"|"$/, '')
+      url = heroku_cmd("heroku pg:backups public-url -q #{backup_id} --app #{app}").strip.gsub(/^"|"$/, '')
       raise "Failed to download database dump" if $? != 0
 
       system('curl', '-o', dump, url)
