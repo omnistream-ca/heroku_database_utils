@@ -22,13 +22,15 @@ module HerokuDatabaseUtils
       raise "Database restore failed" unless $? == 0
     end
 
-    def load_latest_app_backup app
+    def load_app_backup(app, backup_id = nil)
       dump = "#{app}.dump"
-      backups = heroku_cmd("heroku pg:backups --app #{app}").split("\n").grep(/ \d{4}-\d\d-\d\d /)
-      if backups.empty?
-        raise "Couldn't find backup ID"
+      if backup_id.nil?
+        backups = heroku_cmd("heroku pg:backups --app #{app}").split("\n").grep(/ \d{4}-\d\d-\d\d /)
+        if backups.empty?
+          raise "Couldn't find backup ID"
+        end
+        backup_id = backups.map { |b| b.split(/\s+/) }.sort_by { |b| b[1] + 'T' + b[2] }.last[0]
       end
-      backup_id = backups.map { |b| b.split(/\s+/) }.sort_by { |b| b[1] + 'T' + b[2] }.last[0]
       puts "Using backup ID: #{backup_id}"
       url = heroku_cmd("heroku pg:backups public-url -q #{backup_id} --app #{app}").strip.gsub(/^"|"$/, '')
       raise "Failed to download database dump" if $? != 0

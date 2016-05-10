@@ -49,21 +49,21 @@ namespace :hdb do
     ns = ns.to_sym
 
     namespace ns do
-      task :load_latest_backup do
-        HdbBackup.new.load_latest_app_backup heroku_name
+      task :load_backup, [ :backup_id ] do |task, args|
+        HdbBackup.new.load_app_backup(heroku_name, args[:backup_id])
       end
 
       desc "Load and sanitize the latest backup from #{heroku_name} into the development environment"
-      task :load => [
+      task :load, [ :backup_id ] => [
         :"hdb:development:backup_unless_present",
-        :"hdb:#{ns}:load_latest_backup",
+        :"hdb:#{ns}:load_backup",
         :"hdb:development:sanitize"
       ]
 
       desc "Load, sanitize and validate the latest backup from #{heroku_name} and then restore the development database"
-      task :validate => [
+      task :validate, [ :backup_id ] => [
         :"hdb:development:backup_unless_present",
-        :"hdb:#{ns}:load_latest_backup",
+        :"hdb:#{ns}:load_backup",
         :"db:migrate",
         :"hdb:development:sanitize",
         :"hdb:development:validate",
