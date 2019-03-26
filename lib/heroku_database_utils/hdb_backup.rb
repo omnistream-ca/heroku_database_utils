@@ -12,7 +12,7 @@ module HerokuDatabaseUtils
     def restore file_name
       system(
         'psql', '-w', '-h', p(:host), '-p', p(:port), '-U', p(:username),
-        '-c', 'DROP SCHEMA public CASCADE; CREATE SCHEMA public', p(:database)
+        '-c', 'DROP SCHEMA public CASCADE; CREATE SCHEMA IF NOT EXISTS public', p(:database)
       )
       raise "Database restore failed" unless $? == 0
       system(
@@ -40,7 +40,7 @@ module HerokuDatabaseUtils
 
       system(
         'psql', '-w', '-h', p(:host), '-p', p(:port), '-U', p(:username),
-        '-c', 'DROP SCHEMA public CASCADE; CREATE SCHEMA public', p(:database)
+        '-c', 'DROP SCHEMA public CASCADE; CREATE SCHEMA IF NOT EXISTS public', p(:database)
       )
       system(
         'pg_restore', '-O', '-w', '-h', p(:host), '-p', p(:port), '-U',
